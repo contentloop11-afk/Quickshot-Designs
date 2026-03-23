@@ -64,7 +64,8 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    /* shift up so the arc PEAK lands on the text center, not the SVG center */
+    transform: translate(-50%, -75%);
     width: min(1000px, 95vw);
     height: min(500px, 47vw);
     pointer-events: none;
@@ -857,9 +858,9 @@
         </linearGradient>
       </defs>
       <!-- glow halo behind arc -->
-      <path d="M 40,380 Q 400,20 760,380" fill="none" stroke="url(#arcLineBlur)" stroke-width="40" filter="url(#blur-arc)" />
+      <path d="M 0,380 Q 400,20 800,380" fill="none" stroke="url(#arcLineBlur)" stroke-width="40" filter="url(#blur-arc)" />
       <!-- sharp arc line -->
-      <path d="M 40,380 Q 400,20 760,380" fill="none" stroke="url(#arcLine)" stroke-width="1.5" />
+      <path d="M 0,380 Q 400,20 800,380" fill="none" stroke="url(#arcLine)" stroke-width="1.5" />
     </svg>
   </div>
 
