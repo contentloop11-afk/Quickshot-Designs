@@ -64,10 +64,10 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    /* shift up so the arc PEAK lands on the text center, not the SVG center */
-    transform: translate(-50%, -75%);
-    width: min(1000px, 95vw);
-    height: min(500px, 47vw);
+    /* SVG center = hero center → peak 215px above text, endpoints 235px below → arc frames text symmetrically */
+    transform: translate(-50%, -50%);
+    width: min(900px, 90vw);
+    height: min(500px, 55vw);
     pointer-events: none;
     will-change: transform;
     z-index: 3;
