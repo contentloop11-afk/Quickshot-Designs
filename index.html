@@ -17,10 +17,8 @@
     --warm-cream:  #F5EDE6;
     --apple-black: #000000;
     --apple-white: #ffffff;
-    --apple-gray:  #f5f5f7;
-    --apple-text:  #1d1d1f;
-    --apple-blue:  #0071e3;
     --apple-mid:   #6e6e73;
+    --apple-blue:  #0071e3;
     --page-max:    860px;
   }
 
@@ -31,34 +29,104 @@
     background: var(--apple-black);
     color: var(--apple-white);
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
 
-  /* ─── HERO ─── */
+  /* ══════════════════════════════
+     HERO — 2.5D PARALLAX
+  ══════════════════════════════ */
   .hero {
-    min-height: 100vh;
-    background:
-      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(176,111,59,0.35) 0%, transparent 70%),
-      radial-gradient(ellipse 60% 40% at 20% 80%, rgba(160,98,42,0.2) 0%, transparent 60%),
-      linear-gradient(180deg, #1f1109 0%, #0c0806 60%, #000 100%);
+    position: relative;
+    min-height: 100svh;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 80px 24px 100px;
-    position: relative;
+    padding: 100px 24px 120px;
     overflow: hidden;
+    background: #0c0806;
   }
 
-  .hero::before {
-    content: '';
+  /* Layer 0 – deepest background glow */
+  .hero-layer-bg {
     position: absolute;
-    width: 600px; height: 600px;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 120% 80% at 50% -10%, rgba(176,111,59,0.45) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 80% 90%, rgba(160,98,42,0.18) 0%, transparent 55%),
+      linear-gradient(180deg, #1f1109 0%, #0c0806 55%, #000 100%);
+    will-change: transform;
+  }
+
+  /* Layer 1 – floating orbs */
+  .hero-orb {
+    position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(160,98,42,0.15) 0%, transparent 70%);
-    top: -100px; left: 50%;
-    transform: translateX(-50%);
     pointer-events: none;
+    will-change: transform;
+  }
+  .hero-orb-1 {
+    width: min(700px, 130vw);
+    height: min(700px, 130vw);
+    background: radial-gradient(circle, rgba(160,98,42,0.22) 0%, transparent 65%);
+    top: -20%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .hero-orb-2 {
+    width: min(400px, 80vw);
+    height: min(400px, 80vw);
+    background: radial-gradient(circle, rgba(176,111,59,0.12) 0%, transparent 65%);
+    bottom: 5%;
+    right: -10%;
+  }
+  .hero-orb-3 {
+    width: min(300px, 60vw);
+    height: min(300px, 60vw);
+    background: radial-gradient(circle, rgba(120,60,10,0.15) 0%, transparent 65%);
+    bottom: 10%;
+    left: -8%;
+  }
+
+  /* Layer 2 – grid lines */
+  .hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(176,111,59,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(176,111,59,0.04) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 75%);
+    will-change: transform;
+  }
+
+  /* Layer 3 – floating particles */
+  .hero-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    will-change: transform;
+  }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(176,111,59,0.6);
+    animation: float-particle linear infinite;
+  }
+
+  @keyframes float-particle {
+    0%   { transform: translateY(0) translateX(0) scale(1); opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-120px) translateX(var(--dx,20px)) scale(0.3); opacity: 0; }
+  }
+
+  /* Hero content */
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    will-change: transform;
   }
 
   .hero-badge {
@@ -71,89 +139,133 @@
     border: 1px solid rgba(176,111,59,0.4);
     padding: 6px 18px;
     border-radius: 100px;
-    margin-bottom: 36px;
+    margin-bottom: 32px;
     backdrop-filter: blur(12px);
     background: rgba(176,111,59,0.08);
+    opacity: 0;
+    animation: fade-up 0.8s ease 0.1s forwards;
   }
 
   .hero h1 {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(42px, 8vw, 76px);
+    font-size: clamp(44px, 10vw, 86px);
     font-weight: 700;
-    line-height: 1.1;
+    line-height: 1.05;
     color: var(--warm-cream);
     margin-bottom: 8px;
     letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fade-up 0.9s ease 0.25s forwards;
   }
 
   .hero h1 em {
     font-style: italic;
     color: var(--warm-brown);
+    position: relative;
+    display: inline-block;
+  }
+
+  /* shimmer underline on name */
+  .hero h1 em::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--warm-brown), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear 1.2s infinite;
+  }
+
+  @keyframes shimmer {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 
   .hero-sub {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(18px, 3vw, 26px);
+    font-size: clamp(16px, 3.5vw, 24px);
     font-weight: 400;
-    color: rgba(245,237,230,0.6);
-    margin-top: 12px;
-    margin-bottom: 48px;
+    color: rgba(245,237,230,0.55);
+    margin-top: 14px;
+    margin-bottom: 44px;
     font-style: italic;
+    opacity: 0;
+    animation: fade-up 0.9s ease 0.4s forwards;
   }
 
   .hero-meta {
     display: flex;
-    gap: 32px;
+    gap: 24px;
     flex-wrap: wrap;
     justify-content: center;
-    font-size: 13px;
-    color: rgba(245,237,230,0.45);
+    font-size: 12px;
+    color: rgba(245,237,230,0.4);
     letter-spacing: 0.04em;
+    opacity: 0;
+    animation: fade-up 0.9s ease 0.55s forwards;
   }
 
   .hero-meta span strong {
-    color: rgba(245,237,230,0.8);
+    color: rgba(245,237,230,0.75);
     font-weight: 500;
   }
 
+  /* scroll indicator */
   .scroll-hint {
     position: absolute;
-    bottom: 36px;
+    bottom: 32px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    color: rgba(245,237,230,0.3);
-    font-size: 11px;
-    letter-spacing: 0.12em;
+    gap: 6px;
+    color: rgba(245,237,230,0.25);
+    font-size: 10px;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    animation: bob 2s ease-in-out infinite;
+    opacity: 0;
+    animation: fade-in 1s ease 1.2s forwards, bob 2.5s ease-in-out 2.2s infinite;
+    z-index: 10;
   }
 
   .scroll-hint::after {
     content: '';
     width: 1px;
-    height: 40px;
-    background: linear-gradient(to bottom, rgba(176,111,59,0.6), transparent);
+    height: 36px;
+    background: linear-gradient(to bottom, rgba(176,111,59,0.7), transparent);
   }
 
   @keyframes bob {
     0%, 100% { transform: translateX(-50%) translateY(0); }
-    50%       { transform: translateX(-50%) translateY(6px); }
+    50%       { transform: translateX(-50%) translateY(7px); }
   }
 
-  /* ─── TRANSITION BAND ─── */
-  .band-transition {
-    height: 120px;
-    background: linear-gradient(180deg, #000 0%, #000 100%);
+  /* ══════════════════════════════
+     SCROLL REVEAL
+  ══════════════════════════════ */
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
   }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .reveal-delay-1 { transition-delay: 0.1s; }
+  .reveal-delay-2 { transition-delay: 0.2s; }
+  .reveal-delay-3 { transition-delay: 0.3s; }
+  .reveal-delay-4 { transition-delay: 0.4s; }
+  .reveal-delay-5 { transition-delay: 0.5s; }
 
-  /* ─── MAIN CONTENT ─── */
+  /* ══════════════════════════════
+     MAIN
+  ══════════════════════════════ */
   .main {
     background: #000;
-    padding: 0 24px 120px;
+    padding: 0 20px 100px;
   }
 
   .container {
@@ -161,20 +273,28 @@
     margin: 0 auto;
   }
 
-  /* ─── PARTIES ─── */
+  /* ══════════════════════════════
+     PARTIES
+  ══════════════════════════════ */
   .parties {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
-    margin-bottom: 64px;
+    gap: 14px;
+    margin-bottom: 56px;
+    padding-top: 64px;
   }
 
   .party-card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 16px;
-    padding: 28px;
+    padding: 24px;
     backdrop-filter: blur(20px);
+    transition: border-color 0.3s, transform 0.3s;
+  }
+  .party-card:hover {
+    border-color: rgba(176,111,59,0.3);
+    transform: translateY(-2px);
   }
 
   .party-label {
@@ -183,11 +303,11 @@
     letter-spacing: 0.15em;
     text-transform: uppercase;
     color: var(--apple-mid);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .party-name {
-    font-size: 17px;
+    font-size: 16px;
     font-weight: 600;
     color: var(--apple-white);
     margin-bottom: 10px;
@@ -196,7 +316,7 @@
   .party-detail {
     font-size: 13px;
     color: var(--apple-mid);
-    line-height: 1.7;
+    line-height: 1.75;
   }
 
   .party-detail a {
@@ -204,50 +324,71 @@
     text-decoration: none;
   }
 
-  /* ─── SECTION HEADER ─── */
+  /* ══════════════════════════════
+     CONTEXT BAND
+  ══════════════════════════════ */
+  .context-band {
+    background: rgba(176,111,59,0.08);
+    border: 1px solid rgba(176,111,59,0.22);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 56px;
+  }
+
+  .context-band p {
+    font-size: 14px;
+    color: rgba(245,237,230,0.72);
+    line-height: 1.8;
+  }
+
+  .context-band strong {
+    color: var(--warm-cream);
+  }
+
+  /* ══════════════════════════════
+     SECTION HEADER
+  ══════════════════════════════ */
   .section-label {
     font-size: 11px;
     font-weight: 600;
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--warm-brown);
-    margin-bottom: 12px;
+    margin-bottom: 10px;
   }
 
   .section-title {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(28px, 5vw, 44px);
+    font-size: clamp(26px, 5vw, 42px);
     font-weight: 700;
     color: var(--apple-white);
     line-height: 1.15;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
     letter-spacing: -0.02em;
   }
 
   .section-desc {
     font-size: 15px;
     color: var(--apple-mid);
-    line-height: 1.7;
+    line-height: 1.75;
     max-width: 560px;
-    margin-bottom: 48px;
+    margin-bottom: 40px;
   }
 
-  /* ─── SERVICE CARDS ─── */
-  .services { margin-bottom: 80px; }
+  /* ══════════════════════════════
+     SERVICE CARDS
+  ══════════════════════════════ */
+  .services { margin-bottom: 72px; }
 
   .service-card {
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 20px;
-    padding: 36px;
-    margin-bottom: 16px;
-    transition: border-color 0.3s;
+    padding: 28px;
+    margin-bottom: 14px;
+    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
     position: relative;
     overflow: hidden;
-  }
-
-  .service-card:hover {
-    border-color: rgba(176,111,59,0.4);
   }
 
   .service-card::before {
@@ -255,9 +396,15 @@
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(176,111,59,0.5), transparent);
+    background: linear-gradient(90deg, transparent, rgba(176,111,59,0.6), transparent);
     opacity: 0;
     transition: opacity 0.3s;
+  }
+
+  .service-card:hover {
+    border-color: rgba(176,111,59,0.35);
+    transform: translateY(-3px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), 0 0 40px rgba(160,98,42,0.08);
   }
 
   .service-card:hover::before { opacity: 1; }
@@ -266,21 +413,24 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 20px;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
   }
 
   .service-name {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 600;
     color: var(--apple-white);
+    line-height: 1.3;
   }
 
   .service-price {
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 700;
     color: var(--apple-white);
     white-space: nowrap;
+    flex-shrink: 0;
   }
 
   .service-price span {
@@ -292,23 +442,24 @@
   .service-desc {
     font-size: 14px;
     color: var(--apple-mid);
-    line-height: 1.7;
-    margin-bottom: 20px;
+    line-height: 1.75;
+    margin-bottom: 18px;
   }
 
   .service-items {
     list-style: none;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 8px 24px;
+    gap: 7px 20px;
   }
 
   .service-items li {
     font-size: 13px;
-    color: rgba(255,255,255,0.65);
+    color: rgba(255,255,255,0.62);
     display: flex;
     align-items: flex-start;
-    gap: 8px;
+    gap: 7px;
+    line-height: 1.4;
   }
 
   .service-items li::before {
@@ -327,20 +478,22 @@
     text-transform: uppercase;
     color: #fff;
     background: var(--warm-brown);
-    padding: 3px 10px;
+    padding: 3px 9px;
     border-radius: 100px;
-    margin-left: 10px;
+    margin-left: 8px;
     vertical-align: middle;
   }
 
-  /* ─── TOTAL BAND ─── */
+  /* ══════════════════════════════
+     TOTAL BAND
+  ══════════════════════════════ */
   .total-band {
     background: linear-gradient(135deg, #1a0e05 0%, #0c0806 100%);
-    border: 1px solid rgba(176,111,59,0.3);
+    border: 1px solid rgba(176,111,59,0.35);
     border-radius: 24px;
-    padding: 48px 40px;
+    padding: 44px 32px;
     text-align: center;
-    margin-bottom: 64px;
+    margin-bottom: 56px;
     position: relative;
     overflow: hidden;
   }
@@ -348,10 +501,10 @@
   .total-band::before {
     content: '';
     position: absolute;
-    width: 400px; height: 200px;
+    width: 500px; height: 200px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(160,98,42,0.2) 0%, transparent 70%);
-    top: -60px; left: 50%;
+    background: radial-gradient(circle, rgba(160,98,42,0.22) 0%, transparent 70%);
+    top: -80px; left: 50%;
     transform: translateX(-50%);
     pointer-events: none;
   }
@@ -362,12 +515,12 @@
     letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--warm-mid);
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
   .total-price {
     font-family: 'Playfair Display', Georgia, serif;
-    font-size: clamp(52px, 10vw, 88px);
+    font-size: clamp(56px, 14vw, 96px);
     font-weight: 700;
     color: var(--warm-cream);
     line-height: 1;
@@ -377,16 +530,18 @@
 
   .total-note {
     font-size: 14px;
-    color: rgba(245,237,230,0.45);
+    color: rgba(245,237,230,0.42);
   }
 
   .total-note strong {
-    color: rgba(245,237,230,0.7);
+    color: rgba(245,237,230,0.68);
     font-weight: 500;
   }
 
-  /* ─── INCLUDES GRID ─── */
-  .includes { margin-bottom: 80px; }
+  /* ══════════════════════════════
+     INCLUDES GRID
+  ══════════════════════════════ */
+  .includes { margin-bottom: 72px; }
 
   .includes-grid {
     display: grid;
@@ -398,20 +553,26 @@
     background: rgba(255,255,255,0.04);
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 16px;
-    padding: 24px;
+    padding: 22px;
+    transition: border-color 0.3s, transform 0.3s;
+  }
+
+  .include-card:hover {
+    border-color: rgba(176,111,59,0.25);
+    transform: translateY(-2px);
   }
 
   .include-icon {
-    font-size: 24px;
-    margin-bottom: 12px;
+    font-size: 22px;
+    margin-bottom: 10px;
     display: block;
   }
 
   .include-title {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--apple-white);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
 
   .include-text {
@@ -420,55 +581,60 @@
     line-height: 1.6;
   }
 
-  /* ─── BUDGET SECTION ─── */
+  /* ══════════════════════════════
+     BUDGET SECTION
+  ══════════════════════════════ */
   .budget-section {
     background: rgba(0,113,227,0.07);
     border: 1px solid rgba(0,113,227,0.2);
     border-radius: 20px;
-    padding: 36px;
-    margin-bottom: 64px;
+    padding: 32px;
+    margin-bottom: 56px;
   }
 
   .budget-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-top: 24px;
+    gap: 12px;
+    margin-top: 20px;
   }
 
   .budget-item {
     text-align: center;
-    padding: 20px;
+    padding: 18px 12px;
     background: rgba(255,255,255,0.04);
     border-radius: 12px;
     border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.3s;
   }
 
+  .budget-item:hover { transform: translateY(-2px); }
+
   .budget-amount {
-    font-size: 24px;
+    font-size: 22px;
     font-weight: 700;
     color: var(--apple-white);
     margin-bottom: 4px;
   }
 
   .budget-label {
-    font-size: 12px;
+    font-size: 11px;
     color: var(--apple-mid);
   }
 
-  /* ─── TERMS ─── */
-  .terms {
-    margin-bottom: 80px;
-  }
+  /* ══════════════════════════════
+     TERMS
+  ══════════════════════════════ */
+  .terms { margin-bottom: 72px; }
 
   .terms-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
+    gap: 10px;
   }
 
   .term-item {
-    padding: 20px 16px;
+    padding: 18px 12px;
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.07);
     border-radius: 12px;
@@ -480,21 +646,23 @@
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--apple-mid);
-    margin-bottom: 8px;
+    margin-bottom: 7px;
   }
 
   .term-value {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: var(--apple-white);
-    line-height: 1.3;
+    line-height: 1.35;
   }
 
-  /* ─── SIGNATURE ─── */
+  /* ══════════════════════════════
+     SIGNATURE
+  ══════════════════════════════ */
   .signature-section {
     border-top: 1px solid rgba(255,255,255,0.08);
-    padding-top: 64px;
-    margin-top: 64px;
+    padding-top: 56px;
+    margin-top: 56px;
   }
 
   .sig-title {
@@ -508,18 +676,16 @@
   .sig-desc {
     font-size: 14px;
     color: var(--apple-mid);
-    margin-bottom: 48px;
-    line-height: 1.6;
+    margin-bottom: 40px;
+    line-height: 1.65;
   }
 
   .sig-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 48px;
-    margin-bottom: 48px;
+    gap: 40px;
+    margin-bottom: 40px;
   }
-
-  .sig-block {}
 
   .sig-line {
     height: 1px;
@@ -532,7 +698,7 @@
     font-size: 13px;
     font-weight: 500;
     color: var(--apple-white);
-    margin-bottom: 4px;
+    margin-bottom: 3px;
   }
 
   .sig-role {
@@ -543,27 +709,45 @@
   .footer-note {
     text-align: center;
     font-size: 12px;
-    color: rgba(255,255,255,0.2);
-    padding-top: 32px;
+    color: rgba(255,255,255,0.18);
+    padding-top: 28px;
     border-top: 1px solid rgba(255,255,255,0.06);
-    line-height: 1.7;
+    line-height: 1.75;
   }
 
-  /* ─── PRINT ─── */
+  /* ══════════════════════════════
+     KEYFRAMES
+  ══════════════════════════════ */
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  /* ══════════════════════════════
+     PRINT
+  ══════════════════════════════ */
   @media print {
     body { background: #fff; color: #000; }
     .hero { background: #f5ede6; min-height: auto; padding: 60px 24px; }
-    .hero h1 { color: #0c0806; }
+    .hero h1, .hero h1 em { color: #0c0806; }
     .hero-sub { color: #A0622A; }
-    .hero-badge { border-color: #A0622A; color: #A0622A; }
-    .scroll-hint { display: none; }
+    .hero-badge { border-color: #A0622A; color: #A0622A; background: none; }
+    .scroll-hint, .hero-layer-bg, .hero-orb, .hero-grid, .hero-particles { display: none; }
+    .hero-content { opacity: 1 !important; transform: none !important; }
+    .reveal { opacity: 1 !important; transform: none !important; }
     .main { background: #fff; }
     .service-card, .party-card, .include-card,
-    .budget-section, .term-item { background: #f9f9f9; border-color: #e0e0e0; }
+    .budget-section, .term-item, .context-band { background: #f9f9f9; border-color: #e0e0e0; }
     .service-name, .service-price, .party-name, .include-title,
-    .term-value, .sig-name, .total-price, .section-title, .sig-title { color: #000; }
+    .term-value, .sig-name, .total-price, .section-title, .sig-title { color: #000 !important; }
     .service-desc, .party-detail, .include-text, .term-label,
-    .budget-label, .section-desc, .total-note, .sig-role, .sig-desc { color: #555; }
+    .budget-label, .section-desc, .total-note, .sig-role, .sig-desc,
+    .context-band p { color: #555 !important; }
     .total-band { background: #f5ede6; border-color: #A0622A; }
     .total-label { color: #A0622A; }
     .total-price { color: #0c0806; }
@@ -572,19 +756,39 @@
     .footer-note { color: #aaa; }
   }
 
-  @media (max-width: 640px) {
+  /* ══════════════════════════════
+     RESPONSIVE — TABLET
+  ══════════════════════════════ */
+  @media (max-width: 700px) {
     .parties { grid-template-columns: 1fr; }
     .service-items { grid-template-columns: 1fr; }
     .includes-grid { grid-template-columns: 1fr 1fr; }
     .terms-grid { grid-template-columns: 1fr 1fr; }
-    .sig-grid { grid-template-columns: 1fr; }
+    .sig-grid { grid-template-columns: 1fr; gap: 24px; }
     .budget-grid { grid-template-columns: 1fr; }
-    .total-band { padding: 36px 24px; }
+    .total-band { padding: 36px 20px; }
+    .service-card { padding: 22px; }
+    .main { padding: 0 16px 80px; }
+    .parties { padding-top: 48px; }
   }
 
-  @media (max-width: 420px) {
+  /* ══════════════════════════════
+     RESPONSIVE — MOBILE
+  ══════════════════════════════ */
+  @media (max-width: 440px) {
     .includes-grid { grid-template-columns: 1fr; }
     .terms-grid { grid-template-columns: 1fr 1fr; }
+    .hero { padding: 80px 20px 100px; }
+    .hero-meta { gap: 12px; font-size: 11px; }
+    .service-top { flex-direction: column; gap: 6px; }
+    .service-price { font-size: 16px; }
+    .budget-grid { grid-template-columns: 1fr 1fr; }
+    .context-band { padding: 20px; }
+  }
+
+  @media (max-width: 340px) {
+    .budget-grid { grid-template-columns: 1fr; }
+    .terms-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -592,14 +796,27 @@
 
 <!-- ══════════════════════════════════════ HERO ══════════════════════════════════════ -->
 <section class="hero">
-  <div class="hero-badge">contentloop · Angebot CL-2026-04</div>
-  <h1>Mehr Buchungen<br>für <em>Matteo</em></h1>
-  <p class="hero-sub">Werbung die neue Kunden nach Rinteln bringt — bezahlt nur wenn du willst</p>
-  <div class="hero-meta">
-    <span><strong>Erstellt:</strong> 20. März 2026</span>
-    <span><strong>Gültig bis:</strong> 20. April 2026</span>
-    <span><strong>Angebot:</strong> CL-2026-04</span>
+
+  <!-- parallax layers (controlled by JS) -->
+  <div class="hero-layer-bg" data-parallax="0.15"></div>
+  <div class="hero-grid" data-parallax="0.08"></div>
+  <div class="hero-orb hero-orb-1" data-parallax="0.22"></div>
+  <div class="hero-orb hero-orb-2" data-parallax="0.18"></div>
+  <div class="hero-orb hero-orb-3" data-parallax="0.12"></div>
+  <div class="hero-particles" id="particles"></div>
+
+  <!-- content -->
+  <div class="hero-content" data-parallax="-0.06">
+    <div class="hero-badge">contentloop · Angebot CL-2026-04</div>
+    <h1>Mehr Buchungen<br>für <em>Matteo</em></h1>
+    <p class="hero-sub">Werbung die neue Kunden nach Rinteln bringt — bezahlt nur wenn du willst</p>
+    <div class="hero-meta">
+      <span><strong>Erstellt:</strong> 20. März 2026</span>
+      <span><strong>Gültig bis:</strong> 20. April 2026</span>
+      <span><strong>Angebot:</strong> CL-2026-04</span>
+    </div>
   </div>
+
   <div class="scroll-hint">Scroll</div>
 </section>
 
@@ -609,7 +826,7 @@
 
     <!-- PARTIES -->
     <div class="parties">
-      <div class="party-card">
+      <div class="party-card reveal">
         <div class="party-label">Auftraggeber</div>
         <div class="party-name">Matteo Schiavano</div>
         <div class="party-detail">
@@ -619,7 +836,7 @@
           <a href="mailto:michelegiovannimassage@gmail.com">michelegiovannimassage@gmail.com</a>
         </div>
       </div>
-      <div class="party-card">
+      <div class="party-card reveal reveal-delay-1">
         <div class="party-label">Auftragnehmer</div>
         <div class="party-name">contentloop</div>
         <div class="party-detail">
@@ -632,26 +849,25 @@
     </div>
 
     <!-- CONTEXT BAND -->
-    <div style="background:rgba(176,111,59,0.08);border:1px solid rgba(176,111,59,0.2);border-radius:16px;padding:28px 32px;margin-bottom:48px;">
-      <p style="font-size:14px;color:rgba(245,237,230,0.75);line-height:1.8;margin:0;">
-        Deine Website hatte in den ersten 24 Stunden bereits <strong style="color:var(--warm-cream);">über 1.800 Aufrufe</strong> — das zeigt: die Nachfrage ist da. Jetzt geht es darum, diese Leute gezielt aus Rinteln &amp; Schaumburg zu dir zu bringen. Genau das machen wir mit diesem Paket.
+    <div class="context-band reveal">
+      <p>
+        Deine Website hatte in den ersten 24 Stunden bereits <strong>über 1.800 Aufrufe</strong> — das zeigt: die Nachfrage ist da. Jetzt geht es darum, diese Leute gezielt aus Rinteln &amp; Schaumburg zu dir zu bringen. Genau das machen wir mit diesem Paket.
       </p>
     </div>
 
     <!-- SERVICES -->
     <section class="services">
-      <div class="section-label">Leistungsübersicht</div>
-      <h2 class="section-title">Was wir für dich tun</h2>
-      <p class="section-desc">
-        Deine Website läuft bereits — jetzt holen wir die Leute aus Rinteln &amp; Schaumburg aktiv rein. Mit bezahlten Anzeigen auf Instagram &amp; TikTok, die direkt auf deine Zielgruppe in der Region zielen.
-      </p>
+      <div class="reveal">
+        <div class="section-label">Leistungsübersicht</div>
+        <h2 class="section-title">Was wir für dich tun</h2>
+        <p class="section-desc">
+          Deine Website läuft bereits — jetzt holen wir die Leute aus Rinteln &amp; Schaumburg aktiv rein. Mit bezahlten Anzeigen auf Instagram &amp; TikTok, die direkt auf deine Zielgruppe in der Region zielen.
+        </p>
+      </div>
 
-      <!-- Card 1: Content -->
-      <div class="service-card">
+      <div class="service-card reveal reveal-delay-1">
         <div class="service-top">
-          <div>
-            <div class="service-name">Content Pakete</div>
-          </div>
+          <div class="service-name">Content Pakete</div>
           <div class="service-price">ab 199 € <span>/ Monat</span></div>
         </div>
         <p class="service-desc">
@@ -667,14 +883,9 @@
         </ul>
       </div>
 
-      <!-- Card 2: Content Pro -->
-      <div class="service-card">
+      <div class="service-card reveal reveal-delay-2">
         <div class="service-top">
-          <div>
-            <div class="service-name">
-              Content Pro <span class="badge-popular">Empfohlen</span>
-            </div>
-          </div>
+          <div class="service-name">Content Pro <span class="badge-popular">Empfohlen</span></div>
           <div class="service-price">329 € <span>/ Monat</span></div>
         </div>
         <p class="service-desc">
@@ -690,12 +901,9 @@
         </ul>
       </div>
 
-      <!-- Card 3: Werbeanzeigen -->
-      <div class="service-card">
+      <div class="service-card reveal reveal-delay-3">
         <div class="service-top">
-          <div>
-            <div class="service-name">Werbeanzeigen-Schaltung</div>
-          </div>
+          <div class="service-name">Werbeanzeigen-Schaltung</div>
           <div class="service-price">149 € <span>/ Monat</span></div>
         </div>
         <p class="service-desc">
@@ -711,14 +919,9 @@
         </ul>
       </div>
 
-      <!-- Card 4: Kombi -->
-      <div class="service-card">
+      <div class="service-card reveal reveal-delay-4">
         <div class="service-top">
-          <div>
-            <div class="service-name">
-              Kombi-Paket · Content Pro + Ads <span class="badge-popular">Best Value</span>
-            </div>
-          </div>
+          <div class="service-name">Kombi-Paket · Content Pro + Ads <span class="badge-popular">Best Value</span></div>
           <div class="service-price">429 € <span>/ Monat</span></div>
         </div>
         <p class="service-desc">
@@ -736,9 +939,9 @@
     </section>
 
     <!-- WERBEBUDGET INFO -->
-    <section class="budget-section">
+    <section class="budget-section reveal">
       <div class="section-label">Werbebudget · Empfehlung</div>
-      <h3 style="font-size:18px;font-weight:600;color:#fff;margin-bottom:8px;">
+      <h3 style="font-size:17px;font-weight:600;color:#fff;margin-bottom:8px;">
         Was kostet das Werbebudget zusätzlich?
       </h3>
       <p style="font-size:14px;color:var(--apple-mid);line-height:1.7;">
@@ -761,7 +964,7 @@
     </section>
 
     <!-- TOTAL -->
-    <div class="total-band">
+    <div class="total-band reveal">
       <div class="total-label">Empfohlenes Paket · Kombi Content Pro + Ads</div>
       <div class="total-price">429 €</div>
       <div class="total-note">
@@ -771,35 +974,37 @@
 
     <!-- INCLUDES -->
     <section class="includes">
-      <div class="section-label">Immer inklusive</div>
-      <h2 class="section-title">Was du immer bekommst</h2>
+      <div class="reveal">
+        <div class="section-label">Immer inklusive</div>
+        <h2 class="section-title">Was du immer bekommst</h2>
+      </div>
       <div class="includes-grid">
-        <div class="include-card">
+        <div class="include-card reveal reveal-delay-1">
           <span class="include-icon">📱</span>
           <div class="include-title">WhatsApp-Support</div>
           <div class="include-text">Direkte Kommunikation — kein Ticket-System, kein Warten.</div>
         </div>
-        <div class="include-card">
+        <div class="include-card reveal reveal-delay-2">
           <span class="include-icon">📊</span>
           <div class="include-title">Monatliches Reporting</div>
           <div class="include-text">Du siehst genau was dein Geld gebracht hat — transparent &amp; verständlich.</div>
         </div>
-        <div class="include-card">
+        <div class="include-card reveal reveal-delay-3">
           <span class="include-icon">🎯</span>
           <div class="include-title">Regionale Ausrichtung</div>
           <div class="include-text">Alle Inhalte auf Rinteln, Schaumburg &amp; Umgebung zugeschnitten.</div>
         </div>
-        <div class="include-card">
+        <div class="include-card reveal reveal-delay-1">
           <span class="include-icon">✏️</span>
           <div class="include-title">Individuelle Inhalte</div>
           <div class="include-text">Kein Template-Brei — alles wird für Matteoschiavano.de erstellt.</div>
         </div>
-        <div class="include-card">
+        <div class="include-card reveal reveal-delay-2">
           <span class="include-icon">🔄</span>
           <div class="include-title">Monatlich kündbar</div>
           <div class="include-text">Keine langen Vertragslaufzeiten — Vertrauen statt Zwang.</div>
         </div>
-        <div class="include-card">
+        <div class="include-card reveal reveal-delay-3">
           <span class="include-icon">⚡</span>
           <div class="include-title">Schnelle Lieferung</div>
           <div class="include-text">Content wird pünktlich geliefert — zuverlässig, jede Woche.</div>
@@ -808,7 +1013,7 @@
     </section>
 
     <!-- TERMS -->
-    <section class="terms">
+    <section class="terms reveal">
       <div class="section-label">Konditionen</div>
       <h2 class="section-title">Das Kleingedruckte</h2>
       <div class="terms-grid">
@@ -829,29 +1034,27 @@
           <div class="term-value">Einmalig<br>50 €</div>
         </div>
       </div>
-      <p style="font-size:13px;color:var(--apple-mid);margin-top:20px;line-height:1.6;">
+      <p style="font-size:13px;color:var(--apple-mid);margin-top:18px;line-height:1.65;">
         Die einmalige Setup-Gebühr (50 €) deckt die Einrichtung aller Konten, Kampagnen-Strukturen und Tracking-Pixel ab. Sie wird nur beim ersten Monat berechnet. Das Werbebudget wird direkt von Matteo Schiavano an Meta / TikTok bezahlt — nicht über contentloop.
       </p>
     </section>
 
     <!-- SIGNATURE -->
-    <section class="signature-section">
+    <section class="signature-section reveal">
       <h2 class="sig-title">Bereit loszulegen?</h2>
       <p class="sig-desc">
         Kreuz das Paket an, unterschreib und schick das Angebot zurück — dann legen wir innerhalb von 7 Werktagen los. Das Angebot ist gültig bis zum 20. April 2026.
       </p>
 
-      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:28px;margin-bottom:32px;">
-        <p style="font-size:13px;color:var(--apple-mid);margin-bottom:16px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Gewähltes Paket</p>
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div style="font-size:18px;font-weight:600;color:#fff;">
-            ☐ &nbsp;Content Pakete (Starter) — 199 € / Monat<br><br>
-            ☐ &nbsp;Content Pro — 329 € / Monat<br><br>
-            ☐ &nbsp;Werbeanzeigen-Schaltung — 149 € / Monat<br><br>
-            ☐ &nbsp;Kombi-Paket (Content Pro + Ads) — 429 € / Monat
-          </div>
+      <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:28px;">
+        <p style="font-size:12px;color:var(--apple-mid);margin-bottom:14px;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;">Gewähltes Paket</p>
+        <div style="font-size:16px;font-weight:600;color:#fff;line-height:2.2;">
+          ☐ &nbsp;Content Pakete (Starter) — 199 € / Monat<br>
+          ☐ &nbsp;Content Pro — 329 € / Monat<br>
+          ☐ &nbsp;Werbeanzeigen-Schaltung — 149 € / Monat<br>
+          ☐ &nbsp;Kombi-Paket (Content Pro + Ads) — 429 € / Monat
         </div>
-        <div style="margin-top:20px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.08);">
+        <div style="margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,0.08);">
           <p style="font-size:13px;color:var(--apple-mid);margin-bottom:8px;">Gewünschtes Werbebudget / Monat (wird direkt an Meta/TikTok gezahlt):</p>
           <div style="height:1px;background:rgba(255,255,255,0.2);width:100%;margin-top:40px;"></div>
         </div>
@@ -879,6 +1082,82 @@
 
   </div>
 </main>
+
+<script>
+  /* ── PARALLAX ── */
+  const parallaxEls = document.querySelectorAll('[data-parallax]');
+
+  function onMouseMove(e) {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+
+    parallaxEls.forEach(el => {
+      const depth = parseFloat(el.dataset.parallax);
+      const tx = dx * depth * 60;
+      const ty = dy * depth * 40;
+      el.style.transform = `translate(${tx}px, ${ty}px)`;
+    });
+  }
+
+  /* gyroscope for mobile */
+  function onDeviceOrientation(e) {
+    const dx = (e.gamma || 0) / 30;  // -1 to 1
+    const dy = (e.beta  || 0) / 40;
+
+    parallaxEls.forEach(el => {
+      const depth = parseFloat(el.dataset.parallax);
+      const tx = dx * depth * 50;
+      const ty = dy * depth * 30;
+      el.style.transform = `translate(${tx}px, ${ty}px)`;
+    });
+  }
+
+  window.addEventListener('mousemove', onMouseMove, { passive: true });
+
+  if (window.DeviceOrientationEvent) {
+    window.addEventListener('deviceorientation', onDeviceOrientation, { passive: true });
+  }
+
+  /* ── PARTICLES ── */
+  const container = document.getElementById('particles');
+  const PARTICLE_COUNT = 18;
+
+  for (let i = 0; i < PARTICLE_COUNT; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = 2 + Math.random() * 3;
+    const left = 10 + Math.random() * 80;
+    const top  = 10 + Math.random() * 80;
+    const dur  = 6 + Math.random() * 10;
+    const delay = Math.random() * 8;
+    const dx   = (Math.random() - 0.5) * 60;
+    p.style.cssText = `
+      width:${size}px; height:${size}px;
+      left:${left}%; top:${top}%;
+      --dx:${dx}px;
+      animation-duration:${dur}s;
+      animation-delay:-${delay}s;
+      opacity:0;
+    `;
+    container.appendChild(p);
+  }
+
+  /* ── SCROLL REVEAL ── */
+  const revealEls = document.querySelectorAll('.reveal');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  revealEls.forEach(el => observer.observe(el));
+</script>
 
 </body>
 </html>
